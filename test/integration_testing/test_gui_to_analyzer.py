@@ -1,14 +1,16 @@
 import pytest
 from unittest.mock import Mock, patch
-from tkinter import Tk
+# from tkinter import Tk  # We remove the real Tk import to avoid TclError
 from gui.code_smell_detector_gui import CodeSmellDetectorGUI
 
 
 @pytest.fixture
 def gui_setup():
-    root = Tk()
-    gui = CodeSmellDetectorGUI(root)
-    return gui
+    # We mock the entire tkinter module used inside the class to prevent it from trying to open windows
+    with patch("gui.code_smell_detector_gui.tk") as mock_tk:
+        root = Mock()
+        gui = CodeSmellDetectorGUI(root)
+        return gui
 
 
 @patch("gui.code_smell_detector_gui.ProjectAnalyzer")

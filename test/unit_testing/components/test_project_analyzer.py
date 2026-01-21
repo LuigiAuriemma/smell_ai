@@ -460,9 +460,7 @@ def test_analyze_project_empty_directory(
     )
 
     # Run the method
-    total_smells = project_analyzer.analyze_project(
-        "test/unit_testing/components/mock_project_path"
-    )
-
-    # Assert that no smells are found
-    assert total_smells == 0
+    with pytest.raises(ValueError, match="contains no Python files"):
+        project_analyzer.analyze_project(
+            "test/unit_testing/components/mock_project_path"
+        )
