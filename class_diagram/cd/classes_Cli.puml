@@ -1,0 +1,9 @@
+@startuml classes_Cli
+set namespaceSeparator none
+class "CodeSmileCLI" as cli.cli_runner.CodeSmileCLI {
+  analyzer : ProjectAnalyzer
+  args
+  execute()
+  validate_args()
+}
+@enduml

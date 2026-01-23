@@ -1,0 +1,117 @@
+@startuml Sequence_WebApp_Detailed
+!theme plain
+autonumber
+
+actor "User" as User
+participant "Next.js Frontend\n(UploadProjectPage)" as FE
+participant "ProjectContext" as Context
+participant "API Utility\n(utils/api.ts)" as API_Util
+participant "API Gateway\n(FastAPI :8000)" as Gateway
+
+box "Microservices" #LightBlue
+    participant "AI Service\n(FastAPI :8001)" as AIService
+    participant "Static Service\n(FastAPI :8002)" as StaticService
+    participant "Report Service\n(FastAPI :8003)" as ReportService
+end box
+
+box "Backend Core / Model" #White
+    participant "Inspector" as CoreInspector
+    participant "Ollama Model\n(Local LLM)" as LLM
+end box
+
+== User Upload & Analysis Start ==
+
+User -> FE: Select Python Project Folder
+FE -> User: Display loaded files
+
+User -> FE: Select Analysis Mode ("AI" or "Static")
+User -> FE: Click "Analyze Project"
+
+FE -> FE: handleSubmitAll()
+activate FE
+    FE -> FE: setProjectsLoadingState(true)
+    FE -> Context: updateProject(isLoading=true)
+
+    FE -> FE: prepareCodeSnippets()
+    note right of FE: Read file contents into memory
+
+    FE -> FE: analyzeCodeSnippets(snippets)
+    activate FE
+        
+        loop for each file snippet
+            alt Mode == "AI"
+                FE -> API_Util: detectAi(snippet)
+                activate API_Util
+                API_Util -> Gateway: POST /api/detect_smell_ai
+                activate Gateway
+                    Gateway -> AIService: POST /detect_smell_ai
+                    activate AIService
+                        AIService -> AIService: validate_code_snippet(AST)
+                        
+                        AIService -> LLM: detect_code_smell(prompt)
+                        activate LLM
+                            note right of LLM: Ollama Inference\n(model: codesmile)
+                        LLM --> AIService: JSON response
+                        deactivate LLM
+
+                        AIService --> Gateway: DetectSmellResponse
+                    deactivate AIService
+                    Gateway --> API_Util: Response
+                deactivate Gateway
+                API_Util --> FE: Result (Success/Smells)
+                deactivate API_Util
+
+            else Mode == "Static"
+                FE -> API_Util: detectStatic(snippet)
+                activate API_Util
+                API_Util -> Gateway: POST /api/detect_smell_static
+                activate Gateway
+                    Gateway -> StaticService: POST /detect_smell_static
+                    activate StaticService
+                        StaticService -> StaticService: Create temp file
+                        
+                        StaticService -> CoreInspector: inspect(temp_path)
+                        activate CoreInspector
+                            note right of CoreInspector: Reuses core python logic\n(AST Parsing, Extractors, RuleChecker)
+                        CoreInspector --> StaticService: DataFrame (Smells)
+                        deactivate CoreInspector
+
+                        StaticService -> StaticService: Cleanup temp file
+                        StaticService --> Gateway: DetectSmellStaticResponse
+                    deactivate StaticService
+                    Gateway --> API_Util: Response
+                deactivate Gateway
+                API_Util --> FE: Result (Success/Smells)
+                deactivate API_Util
+            end
+        end
+
+    deactivate FE
+
+    FE -> FE: updateProjectsWithAnalysisResults()
+    FE -> Context: updateProject(smells, result, isLoading=false)
+    FE --> User: Display Analysis Results (Cards/Table)
+
+deactivate FE
+
+== Report Generation (Optional) ==
+
+User -> FE: Click "Generate Report"
+FE -> API_Util: generateReport(projects)
+activate API_Util
+    API_Util -> Gateway: POST /api/generate_report
+    activate Gateway
+        Gateway -> ReportService: POST /generate_report
+        activate ReportService
+            ReportService -> ReportService: Compute Statistics
+            ReportService -> ReportService: Build PDF/JSON
+            ReportService --> Gateway: ReportData
+        deactivate ReportService
+        Gateway --> API_Util: ReportData
+    deactivate Gateway
+    API_Util --> FE: Return Report Data
+deactivate API_Util
+
+FE -> User: Download/Display Report
+
+@enduml

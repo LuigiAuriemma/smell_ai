@@ -1,0 +1,7 @@
+@startuml packages_Cli
+set namespaceSeparator none
+package "cli" as cli {
+}
+package "cli.cli_runner" as cli.cli_runner {
+}
+@enduml

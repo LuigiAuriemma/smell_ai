@@ -1,0 +1,31 @@
+@startuml packages_FineTuning
+set namespaceSeparator none
+package "finetuning" as finetuning {
+}
+package "finetuning.train" as finetuning.train {
+}
+package "finetuning.train.dataset_handler" as finetuning.train.dataset_handler {
+}
+package "finetuning.train.model_trainer" as finetuning.train.model_trainer {
+}
+package "finetuning.train.training_configuration" as finetuning.train.training_configuration {
+}
+package "finetuning.train.training_runner" as finetuning.train.training_runner {
+}
+package "finetuning.validation" as finetuning.validation {
+}
+package "finetuning.validation.dataset_evaluator" as finetuning.validation.dataset_evaluator {
+}
+package "finetuning.validation.model_inference" as finetuning.validation.model_inference {
+}
+package "finetuning.validation.smell_parser" as finetuning.validation.smell_parser {
+}
+package "finetuning.validation.validation_runner" as finetuning.validation.validation_runner {
+}
+finetuning.train.training_runner --> finetuning.train.dataset_handler
+finetuning.train.training_runner --> finetuning.train.model_trainer
+finetuning.train.training_runner --> finetuning.train.training_configuration
+finetuning.validation.dataset_evaluator --> finetuning.validation.smell_parser
+finetuning.validation.validation_runner --> finetuning.validation.dataset_evaluator
+finetuning.validation.validation_runner --> finetuning.validation.model_inference
+@enduml

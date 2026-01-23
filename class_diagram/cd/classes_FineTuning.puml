@@ -1,0 +1,53 @@
+@startuml classes_FineTuning
+left to right direction
+set namespaceSeparator none
+class "DatasetEvaluator" as finetuning.validation.dataset_evaluator.DatasetEvaluator {
+  valid_labels
+  calculate_metrics(y_true, y_pred)
+  evaluate(model_inference, val_data)
+}
+class "DatasetHandler" as finetuning.train.dataset_handler.DatasetHandler {
+  input_path
+  split_dataset : bool
+  train_path
+  val_path
+  format_for_training(dataset, tokenizer)
+  load_or_process_dataset()
+}
+class "ModelInference" as finetuning.validation.model_inference.ModelInference {
+  device : str
+  model
+  tokenizer
+  infer(user_message)
+}
+class "ModelTrainer" as finetuning.train.model_trainer.ModelTrainer {
+  dtype
+  load_in_4bit
+  max_seq_length
+  model : NoneType
+  model_name
+  tokenizer : NoneType
+  apply_chat_template(template_name)
+  apply_lora(r, target_modules, lora_alpha, lora_dropout, bias, use_gradient_checkpointing, random_state, use_rslora, loftq_config)
+  load_model()
+}
+class "SmellParser" as finetuning.validation.smell_parser.SmellParser {
+  extract_true_labels(conversation)
+  parse_smells(response_text, valid_labels)
+}
+class "TrainingConfiguration" as finetuning.train.training_configuration.TrainingConfiguration {
+  epochs
+  gradient_accumulation_steps
+  max_seq_length
+  model
+  output_dir
+  per_device_batch_size
+  tokenizer
+  train_dataset
+  trainer : NoneType
+  warmup_steps : NoneType
+  calculate_warmup_steps(dataset_length, epochs, batch_size, warmup_percentage)
+  configure_training(learning_rate, weight_decay, seed)
+  train_and_save(resume_from_checkpoint)
+}
+@enduml

@@ -1,0 +1,15 @@
+@startuml packages_Components
+set namespaceSeparator none
+package "components" as components {
+}
+package "components.inspector" as components.inspector {
+}
+package "components.project_analyzer" as components.project_analyzer {
+}
+package "components.project_repository_cloner" as components.project_repository_cloner {
+}
+package "components.rule_checker" as components.rule_checker {
+}
+components.inspector --> components.rule_checker
+components.project_analyzer --> components.inspector
+@enduml

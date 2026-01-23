@@ -1,0 +1,101 @@
+@startuml classes_Data_Preparation
+set namespaceSeparator none
+class "BalancedDatasetBuilder" as data_preparation.balanced_dataset_builder.BalancedDatasetBuilder {
+  clean_path
+  injected_path
+  label_mapping : dict
+  output_path
+  smelly_path
+  balance_classes(smelly, injected, target_per_smell)
+  build_full_dataset(target_clean, target_per_smell, max_injected)
+  build_injected_only_dataset(max_clean, max_injected)
+  extract_python_code(code)
+  load_json(file_path)
+  normalize_labels(labels)
+  process_injected_functions(injected_functions, max_injected)
+  process_smelly_functions(smelly_functions)
+  remove_comments(code)
+  save_json(data, file_path)
+}
+class "BaseLLM" as data_preparation.base_llm.BaseLLM {
+  {abstract}generate_response(prompt)
+}
+class "CodeSmellAnalyzer" as data_preparation.code_smell_analyzer.CodeSmellAnalyzer {
+  clean_results : list
+  dataset
+  dataset_path
+  file_cache : dict
+  inspector : Inspector
+  label_mapping : dict
+  log_interval : int
+  logger : NoneType, RootLogger
+  max_workers : int
+  output_dir
+  smelly_results : list
+  analyze_dataset_parallel()
+  analyze_function_in_file(function_data)
+  load_dataset()
+  run()
+  save_results()
+}
+class "CodeSmellInjector" as data_preparation.code_smell_injector.CodeSmellInjector {
+  llm_model
+  max_smells : int
+  smell_descriptions : dict
+  inject_smells(clean_function, num_smells)
+}
+class "DatasetEvaluator" as data_preparation.dataset_evaluator.DatasetEvaluator {
+  dataset
+  inspector : Inspector
+  output_path
+  temp_dir : str
+  analyze_code_similarity(similarity_matrix, threshold)
+  compute_code_similarity(dataset)
+  compute_similarity_distribution(similarity_matrix)
+  exclude_invalid_syntax()
+  extract_python_code(input_string)
+  is_valid_syntax_using_inspector(code)
+  load_dataset(path)
+  load_smell_definitions(path)
+  plot_similarity_distribution(similarity_matrix)
+  process_and_save_results()
+  save_invalid_entries(invalid_entries)
+}
+class "FunctionDatasetBuilder" as data_preparation.function_dataset_builder.FunctionDatasetBuilder {
+  libraries : list
+  repo_path
+  build_dataset()
+  extract_functions(file_path)
+  get_python_files()
+  save_dataset(dataset, output_path)
+}
+class "InjectedSmellsDatasetBuilder" as data_preparation.injected_smells_dataset_builder.InjectedSmellsDatasetBuilder {
+  checkpoint_path
+  injector
+  input_path
+  output_path
+  timeout_seconds : int
+  load_checkpoint()
+  process_dataset()
+  process_function_with_timeout(func, index, total_functions)
+  save_checkpoint(processed_indices)
+  save_incremental_output(smelly_functions)
+}
+class "QwenLLM" as data_preparation.qwen_llm.QwenLLM {
+  model_name : str
+  generate_response(prompt)
+}
+class "RepositoryDownloader" as data_preparation.repository_downloader.RepositoryDownloader {
+  github
+  libraries : list
+  output_folder : str
+  processed_repos : set
+  processed_repos_path
+  load_processed_repos()
+  save_processed_repos()
+  search_and_process_topics(topics, max_repos_per_topic, stars, pushed, language, download)
+}
+data_preparation.qwen_llm.QwenLLM --|> data_preparation.base_llm.BaseLLM
+data_preparation.base_llm.BaseLLM --o data_preparation.code_smell_injector.CodeSmellInjector : llm_model
+data_preparation.code_smell_injector.CodeSmellInjector --o data_preparation.injected_smells_dataset_builder.InjectedSmellsDatasetBuilder : injector
+@enduml

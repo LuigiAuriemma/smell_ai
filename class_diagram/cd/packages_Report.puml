@@ -1,0 +1,7 @@
+@startuml packages_Report
+set namespaceSeparator none
+package "report" as report {
+}
+package "report.report_generator" as report.report_generator {
+}
+@enduml

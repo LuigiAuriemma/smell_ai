@@ -1,0 +1,29 @@
+@startuml classes_Code_Extractor
+set namespaceSeparator none
+class "DataFrameExtractor" as code_extractor.dataframe_extractor.DataFrameExtractor {
+  df_methods : list
+  extract_dataframe_variables(fun_node: ast.AST, alias: str) -> list[str]
+  load_dataframe_dict(path: str)
+  track_dataframe_accesses(fun_node: ast.AST, dataframe_vars: list[str]) -> dict[str, list[str]]
+  track_dataframe_methods(fun_node: ast.AST, dataframe_vars: list[str]) -> dict[str, list[str]]
+}
+class "LibraryExtractor" as code_extractor.library_extractor.LibraryExtractor {
+  extract_libraries(tree: ast.AST) -> list[dict[str, str]]
+  get_library_aliases(libraries: list[dict[str, str]]) -> dict[str, str]
+  get_library_of_node(node: ast.AST, aliases: dict[str, str]) -> str
+}
+class "ModelExtractor" as code_extractor.model_extractor.ModelExtractor {
+  model_dict : NoneType
+  models_path : str
+  tensor_operations_dict : NoneType
+  tensors_path : str
+  check_model_method(model: str, libraries: list[str]) -> bool
+  load_model_dict() -> dict[str, list]
+  load_model_methods() -> list[str]
+  load_tensor_operations_dict() -> dict[str, list]
+}
+class "VariableExtractor" as code_extractor.variable_extractor.VariableExtractor {
+  extract_variable_definitions(fun_node: ast.AST) -> dict[str, ast.Assign]
+  track_variable_usage(fun_node: ast.AST) -> dict[str, list[ast.Name]]
+}
+@enduml

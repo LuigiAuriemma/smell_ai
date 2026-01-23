@@ -1,0 +1,36 @@
+@startuml packages_Data_Preparation
+set namespaceSeparator none
+package "data_preparation" as data_preparation {
+}
+package "data_preparation.balanced_dataset_builder" as data_preparation.balanced_dataset_builder {
+}
+package "data_preparation.base_llm" as data_preparation.base_llm {
+}
+package "data_preparation.code_smell_analyzer" as data_preparation.code_smell_analyzer {
+}
+package "data_preparation.code_smell_injector" as data_preparation.code_smell_injector {
+}
+package "data_preparation.dataset_creation_runner" as data_preparation.dataset_creation_runner {
+}
+package "data_preparation.dataset_evaluator" as data_preparation.dataset_evaluator {
+}
+package "data_preparation.function_dataset_builder" as data_preparation.function_dataset_builder {
+}
+package "data_preparation.injected_smells_dataset_builder" as data_preparation.injected_smells_dataset_builder {
+}
+package "data_preparation.qwen_llm" as data_preparation.qwen_llm {
+}
+package "data_preparation.repository_downloader" as data_preparation.repository_downloader {
+}
+data_preparation.code_smell_injector --> data_preparation.base_llm
+data_preparation.dataset_creation_runner --> data_preparation.balanced_dataset_builder
+data_preparation.dataset_creation_runner --> data_preparation.code_smell_analyzer
+data_preparation.dataset_creation_runner --> data_preparation.code_smell_injector
+data_preparation.dataset_creation_runner --> data_preparation.function_dataset_builder
+data_preparation.dataset_creation_runner --> data_preparation.injected_smells_dataset_builder
+data_preparation.dataset_creation_runner --> data_preparation.qwen_llm
+data_preparation.dataset_creation_runner --> data_preparation.repository_downloader
+data_preparation.injected_smells_dataset_builder --> data_preparation.code_smell_injector
+data_preparation.injected_smells_dataset_builder --> data_preparation.qwen_llm
+data_preparation.qwen_llm --> data_preparation.base_llm
+@enduml

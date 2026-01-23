@@ -1,0 +1,13 @@
+@startuml packages_Code_Extractor
+set namespaceSeparator none
+package "code_extractor" as code_extractor {
+}
+package "code_extractor.dataframe_extractor" as code_extractor.dataframe_extractor {
+}
+package "code_extractor.library_extractor" as code_extractor.library_extractor {
+}
+package "code_extractor.model_extractor" as code_extractor.model_extractor {
+}
+package "code_extractor.variable_extractor" as code_extractor.variable_extractor {
+}
+@enduml

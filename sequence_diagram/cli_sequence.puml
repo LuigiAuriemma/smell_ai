@@ -1,0 +1,142 @@
+@startuml Sequence_CLI
+!theme plain
+autonumber
+
+actor "User" as User
+participant "CodeSmileCLI" as CLI
+participant "ProjectAnalyzer" as Analyzer
+participant "FileUtils" as Utils
+box "Core Analysis Components" #White
+    participant "Inspector" as Inspector
+    participant "RuleChecker" as Rules
+end box
+box "Extractors" #HoneyDew
+    participant "LibraryExtractor" as LibExt
+    participant "VariableExtractor" as VarExt
+    participant "DataFrameExtractor" as DFExt
+    participant "ModelExtractor" as ModExt
+end box
+
+== Initialization & Setup ==
+User -> CLI: execute()
+activate CLI
+
+CLI -> CLI: validate_args()
+
+create Analyzer
+CLI -> Analyzer: __init__(output_path)
+activate Analyzer
+
+    Analyzer -> Utils: clean_directory(base_output_path)
+
+    create Inspector
+    Analyzer -> Inspector: __init__(output_path)
+    activate Inspector
+        
+        note right of Inspector: Load config paths (CSVs)
+
+        Inspector -> Inspector: _setup(dicts_paths...)
+        activate Inspector
+            create Rules
+            Inspector -> Rules: __init__(output_path)
+            
+            create VarExt
+            Inspector -> VarExt: __init__()
+            
+            create LibExt
+            Inspector -> LibExt: __init__()
+            
+            create ModExt
+            Inspector -> ModExt: __init__(paths...)
+            Inspector -> ModExt: load_model_dict()
+            Inspector -> ModExt: load_tensor_operations_dict()
+
+            create DFExt
+            Inspector -> DFExt: __init__(path...)
+            Inspector -> DFExt: load_dataframe_dict()
+        deactivate Inspector
+    
+    deactivate Inspector
+deactivate Analyzer
+
+== Analysis Execution ==
+
+CLI -> Analyzer: analyze_project(project_path)
+activate Analyzer
+
+    Analyzer -> Utils: get_python_files(project_path)
+    activate Utils
+    Utils --> Analyzer: filenames[]
+    deactivate Utils
+
+    loop for each filename in filenames
+        alt file processing
+            Analyzer -> Inspector: inspect(filename)
+            activate Inspector
+            
+            note right of Inspector: Parse Source Code to AST
+
+            group Step 1: Library Extraction
+                Inspector -> LibExt: extract_libraries(tree)
+                activate LibExt
+                LibExt --> Inspector: raw_libraries
+                deactivate LibExt
+                Inspector -> LibExt: get_library_aliases(raw_libraries)
+                activate LibExt
+                LibExt --> Inspector: libraries (aliases)
+                deactivate LibExt
+            end
+
+            group Step 2: Context Build (First Pass)
+                loop for each FunctionDef node in AST
+                    Inspector -> VarExt: extract_variable_definitions(node)
+                    activate VarExt
+                    VarExt --> Inspector: func_vars
+                    deactivate VarExt
+
+                    Inspector -> DFExt: extract_dataframe_variables(node, alias)
+                    activate DFExt
+                    DFExt --> Inspector: func_df_vars
+                    deactivate DFExt
+                    
+                    note right of Inspector: Cache variables by function name
+                end
+            end
+
+            group Step 3: Rule Checking (Second Pass)
+                loop for each FunctionDef node in AST
+                    note right of Inspector
+                        Build **function_data**:
+                        - libraries
+                        - variables
+                        - source lines
+                        - known DF methods
+                        - known Model methods
+                    end note
+
+                    Inspector -> Rules: rule_check(node, function_data, ...)
+                    activate Rules
+                    Rules --> Inspector: specific_smells (df)
+                    deactivate Rules
+                end
+            end
+
+            Inspector --> Analyzer: file_smells (DataFrame)
+            deactivate Inspector
+        
+        else Error Handling (SyntaxError/FileNotFound)
+            Analyzer -> Analyzer: Log error to error.txt
+        end
+    end
+
+    Analyzer -> Analyzer: _save_results(total_smells, "overview.csv")
+    note right of Analyzer: Save CSV to output folder
+
+    Analyzer --> CLI: total_smells_count
+
+deactivate Analyzer
+
+CLI -> User: Print Summary & Exit
+deactivate CLI
+
+@enduml

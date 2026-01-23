@@ -1,0 +1,74 @@
+@startuml classes_Detection_Rules
+left to right direction
+set namespaceSeparator none
+class "BroadcastingFeatureNotUsedSmell" as detection_rules.generic.broadcasting_feature_not_used.BroadcastingFeatureNotUsedSmell {
+  detect(ast_node: ast.AST, extracted_data: dict[str, any]) -> list[dict[str, any]]
+}
+class "ChainIndexingSmell" as detection_rules.api_specific.chain_indexing_smell.ChainIndexingSmell {
+  detect(ast_node: ast.AST, extracted_data: dict[str, any]) -> list[dict[str, any]]
+}
+class "ColumnsAndDatatypeNotExplicitlySetSmell" as detection_rules.generic.columns_and_datatype_not_explicitly_set.ColumnsAndDatatypeNotExplicitlySetSmell {
+  detect(ast_node: ast.AST, extracted_data: dict[str, any]) -> list[dict[str, any]]
+}
+class "DataFrameConversionAPIMisused" as detection_rules.api_specific.dataframe_conversion_api_misused.DataFrameConversionAPIMisused {
+  detect(ast_node: ast.AST, extracted_data: dict[str, any]) -> list[dict[str, any]]
+}
+class "DeterministicAlgorithmOptionSmell" as detection_rules.generic.deterministic_algorithm_option_not_used.DeterministicAlgorithmOptionSmell {
+  detect(ast_node: ast.AST, extracted_data: dict[str, any]) -> list[dict[str, any]]
+}
+class "EmptyColumnMisinitializationSmell" as detection_rules.generic.empty_column_misinitialization.EmptyColumnMisinitializationSmell {
+  detect(ast_node: ast.AST, extracted_data: dict[str, any]) -> list[dict[str, any]]
+}
+class "GradientsNotClearedSmell" as detection_rules.api_specific.gradients_not_cleared_before_backward_propagation.GradientsNotClearedSmell {
+  detect(ast_node: ast.AST, extracted_data: dict[str, any]) -> list[dict[str, any]]
+}
+class "HyperparametersNotExplicitlySetSmell" as detection_rules.generic.hyperparameters_not_explicitly_set.HyperparametersNotExplicitlySetSmell {
+  detect(ast_node: ast.AST, extracted_data: dict[str, any]) -> list[dict[str, any]]
+}
+class "InPlaceAPIsMisusedSmell" as detection_rules.generic.in_place_apis_misused.InPlaceAPIsMisusedSmell {
+  detect(ast_node: ast.AST, extracted_data: dict[str, any]) -> list[dict[str, any]]
+}
+class "MatrixMultiplicationAPIMisused" as detection_rules.api_specific.matrix_multiplication_api_misused.MatrixMultiplicationAPIMisused {
+  detect(ast_node: ast.AST, extracted_data: dict[str, any]) -> list[dict[str, any]]
+}
+class "MemoryNotFreedSmell" as detection_rules.generic.memory_not_freed.MemoryNotFreedSmell {
+  detect(ast_node: ast.AST, extracted_data: dict[str, any]) -> list[dict[str, any]]
+}
+class "MergeAPIParameterNotExplicitlySetSmell" as detection_rules.generic.merge_api_parameter_not_explicitly_set.MergeAPIParameterNotExplicitlySetSmell {
+  detect(ast_node: ast.AST, extracted_data: dict[str, any]) -> list[dict[str, any]]
+}
+class "NanEquivalenceComparisonMisusedSmell" as detection_rules.generic.nan_equivalence_comparison_misused.NanEquivalenceComparisonMisusedSmell {
+  detect(ast_node: ast.AST, extracted_data: dict[str, any]) -> list[dict[str, any]]
+}
+class "PyTorchCallMethodMisusedSmell" as detection_rules.api_specific.pytorch_call_method_misused.PyTorchCallMethodMisusedSmell {
+  detect(ast_node: ast.AST, extracted_data: dict[str, any]) -> list[dict[str, any]]
+}
+class "Smell" as detection_rules.smell.Smell {
+  description : str
+  name : str
+  {abstract}detect(ast_node: ast.AST, extracted_data: dict[str, any]) -> list[dict[str, any]]
+  format_smell(line: int, additional_info: str) -> dict[str, any]
+}
+class "TensorArrayNotUsedSmell" as detection_rules.api_specific.tensor_array_not_used.TensorArrayNotUsedSmell {
+  detect(ast_node: ast.AST, extracted_data: dict[str, any]) -> list[dict[str, any]]
+}
+class "UnnecessaryIterationSmell" as detection_rules.generic.unnecessary_iteration.UnnecessaryIterationSmell {
+  detect(ast_node: ast.AST, extracted_data: dict[str, any]) -> list[dict[str, any]]
+}
+detection_rules.api_specific.chain_indexing_smell.ChainIndexingSmell --|> detection_rules.smell.Smell
+detection_rules.api_specific.dataframe_conversion_api_misused.DataFrameConversionAPIMisused --|> detection_rules.smell.Smell
+detection_rules.api_specific.gradients_not_cleared_before_backward_propagation.GradientsNotClearedSmell --|> detection_rules.smell.Smell
+detection_rules.api_specific.matrix_multiplication_api_misused.MatrixMultiplicationAPIMisused --|> detection_rules.smell.Smell
+detection_rules.api_specific.pytorch_call_method_misused.PyTorchCallMethodMisusedSmell --|> detection_rules.smell.Smell
+detection_rules.api_specific.tensor_array_not_used.TensorArrayNotUsedSmell --|> detection_rules.smell.Smell
+detection_rules.generic.broadcasting_feature_not_used.BroadcastingFeatureNotUsedSmell --|> detection_rules.smell.Smell
+detection_rules.generic.columns_and_datatype_not_explicitly_set.ColumnsAndDatatypeNotExplicitlySetSmell --|> detection_rules.smell.Smell
+detection_rules.generic.deterministic_algorithm_option_not_used.DeterministicAlgorithmOptionSmell --|> detection_rules.smell.Smell
+detection_rules.generic.empty_column_misinitialization.EmptyColumnMisinitializationSmell --|> detection_rules.smell.Smell
+detection_rules.generic.hyperparameters_not_explicitly_set.HyperparametersNotExplicitlySetSmell --|> detection_rules.smell.Smell
+detection_rules.generic.in_place_apis_misused.InPlaceAPIsMisusedSmell --|> detection_rules.smell.Smell
+detection_rules.generic.memory_not_freed.MemoryNotFreedSmell --|> detection_rules.smell.Smell
+detection_rules.generic.merge_api_parameter_not_explicitly_set.MergeAPIParameterNotExplicitlySetSmell --|> detection_rules.smell.Smell
+detection_rules.generic.nan_equivalence_comparison_misused.NanEquivalenceComparisonMisusedSmell --|> detection_rules.smell.Smell
+detection_rules.generic.unnecessary_iteration.UnnecessaryIterationSmell --|> detection_rules.smell.Smell
+@enduml

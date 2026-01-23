@@ -1,0 +1,139 @@
+@startuml Sequence_GUI_Detailed
+!theme plain
+autonumber
+
+actor "User" as User
+participant "CodeSmileGUI" as App
+participant "CodeSmellDetectorGUI" as GUI
+participant "Tkinter" as TK
+participant "TextBoxRedirect" as Redirect
+participant "AnalysisThread" as Thread
+participant "ProjectAnalyzer" as Analyzer
+participant "Inspector" as Inspector
+participant "RuleChecker" as Rules
+box "Extractors" #HoneyDew
+    participant "LibraryExtractor" as LibExt
+    participant "VariableExtractor" as VarExt
+    participant "DataFrameExtractor" as DFExt
+    participant "ModelExtractor" as ModExt
+end box
+
+== Initialization ==
+User -> App: Start Application
+activate App
+    App -> TK: Tk()
+    activate TK
+    create GUI
+    App -> GUI: __init__(root)
+    activate GUI
+        GUI -> GUI: setup_gui()
+        note right: UI Layout Construction
+        
+        GUI -> GUI: configure_stdout()
+        activate GUI
+            create Redirect
+            GUI -> Redirect: __init__(output_textbox)
+            GUI -> Redirect: sys.stdout = self
+        deactivate GUI
+    deactivate GUI
+    
+    App -> TK: mainloop()
+
+== User Interaction ==
+User -> GUI: Select Input/Output Paths
+User -> GUI: Configure Parameters (Walkers, Parallel, etc.)
+User -> GUI: Click "Run"
+
+GUI -> GUI: run_program()
+activate GUI
+    GUI -> GUI: Validate Paths
+    GUI -> GUI: Gather Parameters
+    
+    create Thread
+    GUI -> Thread: Thread(target=run_analysis, ...)
+    GUI -> Thread: start()
+deactivate GUI
+
+== Analysis Execution (Background Thread) ==
+activate Thread
+    Thread -> GUI: run_analysis(...)
+    activate GUI
+        
+        note right of GUI: All print() calls now go to text widget
+        GUI -> Redirect: write("Input Path: ...")
+        Redirect -> TK: output_textbox.insert(...)
+
+        create Analyzer
+        GUI -> Analyzer: __init__(output_path)
+        activate Analyzer
+            create Inspector
+            Analyzer -> Inspector: __init__(output_path)
+            activate Inspector
+                Inspector -> Inspector: _setup()
+                activate Inspector
+                    create Rules
+                    Inspector -> Rules: __init__()
+                    create LibExt
+                    Inspector -> LibExt: __init__()
+                    create VarExt
+                    Inspector -> VarExt: __init__()
+                    create ModExt
+                    Inspector -> ModExt: __init__()
+                    create DFExt
+                    Inspector -> DFExt: __init__()
+                    
+                    Inspector -> ModExt: load_model_dict()
+                    Inspector -> DFExt: load_dataframe_dict()
+                deactivate Inspector
+            deactivate Inspector
+        deactivate Analyzer
+
+        alt Single Project Analysis
+            GUI -> Analyzer: analyze_project(input_path)
+            activate Analyzer
+            
+            Analyzer -> Analyzer: get_python_files(path)
+            
+            loop for each file
+                Analyzer -> Inspector: inspect(filename)
+                activate Inspector
+                    
+                    Inspector -> LibExt: extract_libraries(AST)
+                    Inspector -> LibExt: get_library_aliases()
+                    
+                    loop each function
+                        Inspector -> VarExt: extract_variable_definitions()
+                        Inspector -> DFExt: extract_dataframe_variables()
+                    end
+                    
+                    loop each function (Rule Check)
+                        Inspector -> Rules: rule_check(node, function_data)
+                        activate Rules
+                        Rules --> Inspector: smells_dataframe
+                        deactivate Rules
+                    end
+
+                    Inspector --> Analyzer: result_dataframe
+                deactivate Inspector
+
+                alt Smells Found
+                    Analyzer -> Redirect: print("Found X code smells...")
+                    Redirect -> TK: Update GUI Textbox
+                end
+            end
+            
+            Analyzer -> Analyzer: _save_results()
+            Analyzer --> GUI: total_smells
+            deactivate Analyzer
+        end
+
+        GUI -> Redirect: print("Analysis Completed. Total Smells: ...")
+    deactivate GUI
+deactivate Thread
+
+== Termination ==
+User -> GUI: Click "Exit"
+GUI -> TK: quit()
+deactivate TK
+deactivate App
+@enduml

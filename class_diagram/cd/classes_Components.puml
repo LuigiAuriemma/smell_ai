@@ -1,0 +1,41 @@
+@startuml classes_Components
+set namespaceSeparator none
+class "Inspector" as components.inspector.Inspector {
+  dataframe_extractor : DataFrameExtractor
+  library_extractor : LibraryExtractor
+  model_extractor : ModelExtractor
+  output_path : str
+  rule_checker
+  variable_extractor : VariableExtractor
+  inspect(filename: str) -> pd.DataFrame
+}
+class "ProjectAnalyzer" as components.project_analyzer.ProjectAnalyzer {
+  base_output_path : str
+  inspector
+  output_path
+  analyze_project(project_path: str) -> int
+  analyze_projects_parallel(base_path: str, max_workers: int)
+  analyze_projects_sequential(base_path: str, resume: bool)
+  clean_output_directory()
+  merge_all_results()
+}
+class "ProjectRepositoryCloner" as components.project_repository_cloner.ProjectRepositoryCloner {
+  base_path : str
+  repo_data_path : str
+  clean()
+  debug_filter_repo(df: pd.DataFrame) -> pd.DataFrame
+  execute()
+  filter_repos(df: pd.DataFrame, stars: int, commits: int) -> pd.DataFrame
+  get_debug_projects()
+  get_projects()
+  get_repo(repo_url: str)
+  setup()
+}
+class "RuleChecker" as components.rule_checker.RuleChecker {
+  output_path : str
+  smells : list
+  rule_check(ast_node: ast.AST, extracted_data: dict[str, any], filename: str, function_name: str, df_output: pd.DataFrame) -> pd.DataFrame
+}
+components.inspector.Inspector --* components.project_analyzer.ProjectAnalyzer : inspector
+components.rule_checker.RuleChecker --* components.inspector.Inspector : rule_checker
+@enduml

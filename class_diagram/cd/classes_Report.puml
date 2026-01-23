@@ -1,0 +1,13 @@
+@startuml classes_Report
+set namespaceSeparator none
+class "ReportGenerator" as report.report_generator.ReportGenerator {
+  input_path : str
+  output_path : str
+  menu()
+  project_report(df)
+  run()
+  smell_report(df)
+  summary_report(df)
+  visualize_smell_report(df)
+}
+@enduml

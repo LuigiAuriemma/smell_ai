@@ -1,0 +1,42 @@
+@startuml classes_Gui
+set namespaceSeparator none
+class "CodeSmellDetectorGUI" as gui.code_smell_detector_gui.CodeSmellDetectorGUI {
+  exit_button : Button
+  input_button : Button
+  input_label : Label
+  input_path : Label
+  master
+  multiple_check : Checkbutton
+  multiple_var : BooleanVar
+  output_button : Button
+  output_label : Label
+  output_path : Label
+  output_textbox : Text
+  parallel_check : Checkbutton
+  parallel_var : BooleanVar
+  project_analyzer : NoneType, ProjectAnalyzer
+  resume_check : Checkbutton
+  resume_var : BooleanVar
+  run_button : Button
+  walker_label : Label
+  walker_picker : Spinbox
+  choose_input_path()
+  choose_output_path()
+  configure_stdout()
+  disable_key_press(event)
+  run_analysis(input_path, output_path, num_walkers, is_parallel, is_resume, is_multiple)
+  run_program()
+  setup_gui()
+}
+class "CodeSmileGUI" as gui.gui_runner.CodeSmileGUI {
+  gui
+  root : Tk
+  run()
+}
+class "TextBoxRedirect" as gui.textbox_redirect.TextBoxRedirect {
+  textbox
+  {abstract}flush()
+  write(text)
+}
+gui.code_smell_detector_gui.CodeSmellDetectorGUI --* gui.gui_runner.CodeSmileGUI : gui
+@enduml

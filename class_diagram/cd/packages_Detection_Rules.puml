@@ -1,0 +1,59 @@
+@startuml packages_Detection_Rules
+set namespaceSeparator none
+package "detection_rules" as detection_rules {
+}
+package "detection_rules.api_specific" as detection_rules.api_specific {
+}
+package "detection_rules.api_specific.chain_indexing_smell" as detection_rules.api_specific.chain_indexing_smell {
+}
+package "detection_rules.api_specific.dataframe_conversion_api_misused" as detection_rules.api_specific.dataframe_conversion_api_misused {
+}
+package "detection_rules.api_specific.gradients_not_cleared_before_backward_propagation" as detection_rules.api_specific.gradients_not_cleared_before_backward_propagation {
+}
+package "detection_rules.api_specific.matrix_multiplication_api_misused" as detection_rules.api_specific.matrix_multiplication_api_misused {
+}
+package "detection_rules.api_specific.pytorch_call_method_misused" as detection_rules.api_specific.pytorch_call_method_misused {
+}
+package "detection_rules.api_specific.tensor_array_not_used" as detection_rules.api_specific.tensor_array_not_used {
+}
+package "detection_rules.generic" as detection_rules.generic {
+}
+package "detection_rules.generic.broadcasting_feature_not_used" as detection_rules.generic.broadcasting_feature_not_used {
+}
+package "detection_rules.generic.columns_and_datatype_not_explicitly_set" as detection_rules.generic.columns_and_datatype_not_explicitly_set {
+}
+package "detection_rules.generic.deterministic_algorithm_option_not_used" as detection_rules.generic.deterministic_algorithm_option_not_used {
+}
+package "detection_rules.generic.empty_column_misinitialization" as detection_rules.generic.empty_column_misinitialization {
+}
+package "detection_rules.generic.hyperparameters_not_explicitly_set" as detection_rules.generic.hyperparameters_not_explicitly_set {
+}
+package "detection_rules.generic.in_place_apis_misused" as detection_rules.generic.in_place_apis_misused {
+}
+package "detection_rules.generic.memory_not_freed" as detection_rules.generic.memory_not_freed {
+}
+package "detection_rules.generic.merge_api_parameter_not_explicitly_set" as detection_rules.generic.merge_api_parameter_not_explicitly_set {
+}
+package "detection_rules.generic.nan_equivalence_comparison_misused" as detection_rules.generic.nan_equivalence_comparison_misused {
+}
+package "detection_rules.generic.unnecessary_iteration" as detection_rules.generic.unnecessary_iteration {
+}
+package "detection_rules.smell" as detection_rules.smell {
+}
+detection_rules.api_specific.chain_indexing_smell --> detection_rules.smell
+detection_rules.api_specific.dataframe_conversion_api_misused --> detection_rules.smell
+detection_rules.api_specific.gradients_not_cleared_before_backward_propagation --> detection_rules.smell
+detection_rules.api_specific.matrix_multiplication_api_misused --> detection_rules.smell
+detection_rules.api_specific.pytorch_call_method_misused --> detection_rules.smell
+detection_rules.api_specific.tensor_array_not_used --> detection_rules.smell
+detection_rules.generic.broadcasting_feature_not_used --> detection_rules.smell
+detection_rules.generic.columns_and_datatype_not_explicitly_set --> detection_rules.smell
+detection_rules.generic.deterministic_algorithm_option_not_used --> detection_rules.smell
+detection_rules.generic.empty_column_misinitialization --> detection_rules.smell
+detection_rules.generic.hyperparameters_not_explicitly_set --> detection_rules.smell
+detection_rules.generic.in_place_apis_misused --> detection_rules.smell
+detection_rules.generic.memory_not_freed --> detection_rules.smell
+detection_rules.generic.merge_api_parameter_not_explicitly_set --> detection_rules.smell
+detection_rules.generic.nan_equivalence_comparison_misused --> detection_rules.smell
+detection_rules.generic.unnecessary_iteration --> detection_rules.smell
+@enduml

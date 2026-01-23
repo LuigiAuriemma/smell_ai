@@ -1,0 +1,13 @@
+@startuml packages_Gui
+set namespaceSeparator none
+package "gui" as gui {
+}
+package "gui.code_smell_detector_gui" as gui.code_smell_detector_gui {
+}
+package "gui.gui_runner" as gui.gui_runner {
+}
+package "gui.textbox_redirect" as gui.textbox_redirect {
+}
+gui.code_smell_detector_gui --> gui.textbox_redirect
+gui.gui_runner --> gui.code_smell_detector_gui
+@enduml

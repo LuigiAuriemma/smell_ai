@@ -1,0 +1,125 @@
+@startuml Sequence_GUI
+!theme plain
+autonumber
+
+actor "User" as User
+participant "CodeSmileGUI\n(Runner)" as App
+participant "Tkinter\nMainLoop" as TK
+participant "CodeSmellDetectorGUI" as GUI
+participant "TextBoxRedirect" as Redirect
+participant "Threading" as Thread
+participant "ProjectAnalyzer" as Analyzer
+
+== Application Launch ==
+
+User -> App: Run Application
+activate App
+    create TK
+    App -> TK: Tk()
+    
+    create GUI
+    App -> GUI: __init__(root)
+    activate GUI
+        GUI -> GUI: setup_gui()
+        note right of GUI: Create Buttons, Labels, Checkboxes
+        
+        GUI -> GUI: configure_stdout()
+        activate GUI
+            create Redirect
+            GUI -> Redirect: __init__(output_textbox)
+            GUI -> GUI: sys.stdout = redirect
+        deactivate GUI
+    deactivate GUI
+
+    App -> TK: mainloop()
+    activate TK
+
+== Configuration Phase ==
+
+User -> GUI: Click "Choose Input Folder"
+activate GUI
+    GUI -> TK: filedialog.askdirectory()
+    activate TK
+    TK --> GUI: selected_path
+    deactivate TK
+    GUI -> GUI: Update input_path label
+deactivate GUI
+
+User -> GUI: Click "Choose Output Folder"
+activate GUI
+    GUI -> TK: filedialog.askdirectory()
+    activate TK
+    TK --> GUI: selected_path
+    deactivate TK
+    GUI -> GUI: Update output_path label
+deactivate GUI
+
+User -> GUI: Adjust Settings (Walkers, Parallel, etc.)
+note right of GUI: User updates Tkinter\nVariables (BooleanVar/Spinbox)
+
+== Analysis Execution ==
+
+User -> GUI: Click "Run"
+activate GUI
+    GUI -> GUI: run_program()
+    activate GUI
+        GUI -> GUI: Validate Paths
+        alt Paths Missing
+            GUI -> Redirect: print("Error: ...")
+            Redirect -> GUI: Update Text Widget
+            return
+        end
+
+        GUI -> GUI: Gather Parameters
+        note right of GUI: Get values from\nspinbox and checkboxes
+
+        create Thread
+        GUI -> Thread: Thread(target=run_analysis, args=...)
+        GUI -> Thread: start()
+    deactivate GUI
+deactivate GUI
+
+activate Thread
+    Thread -> GUI: run_analysis(...)
+    activate GUI
+        GUI -> Redirect: print(Configuration Info)
+        Redirect -> GUI: Update Text Widget
+
+        create Analyzer
+        GUI -> Analyzer: __init__(output_path)
+        activate Analyzer
+            Analyzer -> Analyzer: clean_output_directory() (if not resume)
+        deactivate Analyzer
+
+        alt Single Project
+            GUI -> Analyzer: analyze_project(input_path)
+            activate Analyzer
+            Analyzer --> GUI: total_smells
+            deactivate Analyzer
+            GUI -> Redirect: print("Analysis Completed...")
+        
+        else Multiple Projects
+            alt Parallel
+                GUI -> Analyzer: analyze_projects_parallel(...)
+            else Sequential
+                GUI -> Analyzer: analyze_projects_sequential(...)
+            end
+            activate Analyzer
+            Analyzer --> GUI: (Analysis Finished)
+            deactivate Analyzer
+            
+            GUI -> Analyzer: merge_all_results()
+        end
+    deactivate GUI
+deactivate Thread
+
+== Application Exit ==
+
+User -> GUI: Click "Exit"
+activate GUI
+    GUI -> TK: quit()
+    deactivate TK
+deactivate GUI
+deactivate App
+
+@enduml
