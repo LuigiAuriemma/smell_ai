@@ -52,14 +52,20 @@ class CodeSmileCLI:
         if self.args.multiple:
             if self.args.parallel:
                 self.analyzer.analyze_projects_parallel(
-                    self.args.input, self.args.max_walkers
+                    self.args.input,
+                    self.args.max_walkers,
+                    generate_graph=self.args.call_graph,
                 )
             else:
                 self.analyzer.analyze_projects_sequential(
-                    self.args.input, resume=self.args.resume
+                    self.args.input,
+                    resume=self.args.resume,
+                    generate_graph=self.args.call_graph,
                 )
         else:
-            total_smells = self.analyzer.analyze_project(self.args.input)
+            total_smells = self.analyzer.analyze_project(
+                self.args.input, generate_graph=self.args.call_graph
+            )
             print(
                 f"Analysis completed. Total code smells found: {total_smells}"
             )
@@ -96,6 +102,11 @@ def main():
         "--resume",
         action="store_true",
         help="Resume previous execution (default: False)",
+    )
+    parser.add_argument(
+        "--call-graph",
+        action="store_true",
+        help="Generate a call graph for the analyzed project(s)",
     )
     parser.add_argument(
         "--multiple",

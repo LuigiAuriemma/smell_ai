@@ -47,12 +47,13 @@ class ProjectAnalyzer:
         df.to_csv(file_path, index=False)
         print(f"Results saved to {file_path}")
 
-    def analyze_project(self, project_path: str) -> int:
+    def analyze_project(self, project_path: str, generate_graph: bool = False) -> int:
         """
         Analyzes a single project for code smells.
 
         Parameters:
         - project_path (str): Path to the project to be analyzed.
+        - generate_graph (bool): Whether to generate a call graph.
 
         Returns:
         - int: Total number of code smells found in the project.
@@ -96,6 +97,14 @@ class ProjectAnalyzer:
 
         self._save_results(to_save, "overview.csv")
 
+        if generate_graph:
+            try:
+                from components.dependency_graph_builder import DependencyGraphBuilder
+                graph_builder = DependencyGraphBuilder(self.output_path)
+                graph_builder.build_graph(filenames)
+            except Exception as e:
+                print(f"Error building call graph: {e}")
+
         print(f"Finished analysis for project: {project_name}")
         print(
             f"Total code smells found in project "
@@ -104,7 +113,7 @@ class ProjectAnalyzer:
         return total_smells
 
     def analyze_projects_sequential(
-        self, base_path: str, resume: bool = False
+        self, base_path: str, resume: bool = False, generate_graph: bool = False
     ):
         """
         Sequentially analyzes multiple projects.
@@ -112,6 +121,7 @@ class ProjectAnalyzer:
         Parameters:
         - base_path (str): Directory containing projects to be analyzed.
         - resume (bool): Whether to resume from the last analyzed project.
+        - generate_graph (bool): Whether to generate a call graph.
         """
         execution_log_path = os.path.join(base_path, "execution_log.txt")
         if not os.path.exists(base_path):
@@ -191,6 +201,15 @@ class ProjectAnalyzer:
                     to_save.to_csv(detailed_file_path, index=False)
                     print(f"Detailed results saved to {detailed_file_path}")
 
+                if generate_graph:
+                    try:
+                        from components.dependency_graph_builder import DependencyGraphBuilder
+                        graph_path = os.path.join(self.output_path, "graphs", dirname)
+                        graph_builder = DependencyGraphBuilder(graph_path)
+                        graph_builder.build_graph(filenames)
+                    except Exception as e:
+                        print(f"Error building call graph for {dirname}: {e}")
+
                 total_smells += project_smells
                 print(
                     f"Project '{dirname}' analyzed successfully."
@@ -208,13 +227,14 @@ class ProjectAnalyzer:
         )
         print(f"Total code smells found in all projects: {total_smells}\n")
 
-    def analyze_projects_parallel(self, base_path: str, max_workers: int):
+    def analyze_projects_parallel(self, base_path: str, max_workers: int, generate_graph: bool = False):
         """
         Analyzes multiple projects in parallel.
 
         Parameters:
         - base_path (str): Directory containing projects to be analyzed.
         - max_workers (int): Maximum number of parallel threads.
+        - generate_graph (bool): Whether to generate a call graph.
         """
         execution_log_path = os.path.join(base_path, "execution_log.txt")
         if not os.path.exists(base_path):
@@ -284,6 +304,15 @@ class ProjectAnalyzer:
                     )
                     to_save.to_csv(detailed_file_path, index=False)
                     print(f"Detailed results saved to {detailed_file_path}")
+
+                if generate_graph:
+                    try:
+                        from components.dependency_graph_builder import DependencyGraphBuilder
+                        graph_path = os.path.join(self.output_path, "graphs", dirname)
+                        graph_builder = DependencyGraphBuilder(graph_path)
+                        graph_builder.build_graph(filenames)
+                    except Exception as e:
+                        print(f"Error building call graph for {dirname}: {e}")
 
                 total_smells += project_smells
 
