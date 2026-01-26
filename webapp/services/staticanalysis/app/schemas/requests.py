@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Optional
 
 
 class DetectSmellRequest(BaseModel):
@@ -7,11 +8,12 @@ class DetectSmellRequest(BaseModel):
     """
 
     code_snippet: str
+    file_name: Optional[str] = None
 
     class Config:
         schema_extra = {
             "example": {
-                """code_snippet": "def example_function():\n
-                print('Hello, world!')""",
+                "code_snippet": "def example_function():\n                print('Hello, world!')",
+                "file_name": "example.py"
             }
         }

@@ -63,6 +63,17 @@ export default function Home() {
               </button>
             </div>
 
+            {/* Call Graph Visualization Button */}
+            <div className="flex justify-center">
+              <button
+                onClick={() => router.push('/call-graph')}
+                className="flex items-center justify-between w-full sm:w-80 bg-purple-500 text-white px-6 py-4 rounded-xl shadow-md hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-300 transition-all transform hover:scale-105"
+              >
+                <span className="text-xl">Call Graph</span>
+                <FaChartBar className="text-white text-2xl" />
+              </button>
+            </div>
+
             {/* Generate Reports Button */}
             <div className="flex justify-center">
               <button

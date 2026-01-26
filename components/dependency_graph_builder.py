@@ -2,7 +2,7 @@ import os
 import ast
 import json
 import networkx as nx
-from typing import List
+from typing import List, Dict
 from code_extractor.call_graph_extractor import CallGraphExtractor
 
 class DependencyGraphBuilder:
@@ -15,7 +15,7 @@ class DependencyGraphBuilder:
         self.graph = nx.DiGraph()
         self.symbol_table = {} 
 
-    def build_graph(self, file_paths: List[str]):
+    def build_graph(self, file_paths: List[str], display_names: Dict[str, str] = None):
         """
         Parses files and constructs the graph.
         """
@@ -28,7 +28,11 @@ class DependencyGraphBuilder:
                 with open(file_path, "r", encoding="utf-8") as f:
                     source = f.read()
                 
-                rel_path = os.path.relpath(file_path, os.getcwd())
+                if display_names and file_path in display_names:
+                    rel_path = display_names[file_path]
+                else:
+                    rel_path = os.path.relpath(file_path, os.getcwd())
+
                 extractor = CallGraphExtractor(source_code=source, file_path=rel_path)
                 tree = ast.parse(source)
                 extractor.visit(tree)
@@ -57,7 +61,10 @@ class DependencyGraphBuilder:
 
         # Pass 2: Calls (Edges)
         for file_path, extractor in file_data.items():
-            rel_path = os.path.relpath(file_path, os.getcwd())
+            if display_names and file_path in display_names:
+                rel_path = display_names[file_path]
+            else:
+                rel_path = os.path.relpath(file_path, os.getcwd())
             
             for call in extractor.calls:
                 caller = call["caller_function"]
@@ -119,3 +126,40 @@ class DependencyGraphBuilder:
             
             f.write("@enduml\n")
         print(f"Call Graph saved to {output_file}")
+
+    def get_graph_data(self):
+        """
+        Computes the graph layout and returns nodes and edges data for frontend visualization.
+        """
+        if not self.graph.nodes:
+            return {"nodes": [], "edges": []}
+            
+        # Use spring layout to calculate positions suitable for force-directed-like appearance
+        pos = nx.spring_layout(self.graph, k=0.5, iterations=50)
+        
+        nodes = []
+        for node, (x, y) in pos.items():
+            # Retrieve attributes stored during build_graph
+            attrs = self.graph.nodes[node]
+            
+            nodes.append({
+                "id": node,
+                "label": node.split("::")[-1] if "::" in node else node, # Show simpler name
+                "full_name": node,
+                "type": attrs.get("type", "function"),
+                "file_path": attrs.get("file", ""),
+                "start_line": attrs.get("start_line", 0),
+                "end_line": attrs.get("end_line", 0),
+                "source_code": attrs.get("source_code", ""),
+                "x": x,
+                "y": y
+            })
+            
+        edges = []
+        for u, v in self.graph.edges():
+            edges.append({
+                "source": u,
+                "target": v
+            })
+            
+        return {"nodes": nodes, "edges": edges}

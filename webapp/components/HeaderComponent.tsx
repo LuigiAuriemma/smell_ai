@@ -21,6 +21,7 @@ export default function Header() {
           <Link href="/" className="hover:text-gray-300 transition-all">Home</Link>
           <Link href="/upload-python" className="hover:text-gray-300 transition-all">Upload Python</Link>
           <Link href="/upload-project" className="hover:text-gray-300 transition-all">Upload Project</Link>
+          <Link href="/call-graph" className="hover:text-gray-300 transition-all">Call Graph</Link>
           <Link href="/reports" className="hover:text-gray-300 transition-all">Reports</Link>
           <Link href="/about" className="hover:text-gray-300 transition-all">About</Link>
         </nav>
@@ -43,6 +44,7 @@ export default function Header() {
             <Link href="/" className="block py-2 px-4 text-white hover:bg-blue-500">Home</Link>
             <Link href="/upload-python" className="block py-2 px-4 text-white hover:bg-blue-500">Upload Python</Link>
             <Link href="/upload-project" className="block py-2 px-4 text-white hover:bg-blue-500">Upload Project</Link>
+            <Link href="/call-graph" className="block py-2 px-4 text-white hover:bg-blue-500">Call Graph</Link>
             <Link href="/reports" className="block py-2 px-4 text-white hover:bg-blue-500">Reports</Link>
             <Link href="/about" className="block py-2 px-4 text-white hover:bg-blue-500">About</Link>
           </motion.div>

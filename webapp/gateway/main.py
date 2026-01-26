@@ -67,3 +67,13 @@ async def generate_report(request: dict):
         response = await client.post(
             f"{REPORT_SERVICE}/generate_report", json=request)
     return response.json()
+
+
+# Proxy requests to Static Analysis Service (Call Graph)
+@app.post("/api/generate_call_graph")
+async def generate_call_graph(request: dict):
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            f"{STATIC_ANALYSIS_SERVICE}/generate_call_graph", json=request
+        )
+    return response.json()
