@@ -464,3 +464,33 @@ def test_analyze_project_empty_directory(
         project_analyzer.analyze_project(
             "test/unit_testing/components/mock_project_path"
         )
+
+
+def test_analyze_project_with_graph_generation(
+    monkeypatch, project_analyzer, mock_file_related_methods
+):
+    """
+    Test that analyze_project calls DependencyGraphBuilder when generate_graph=True.
+    """
+    # Mock inspect to return empty dataframe
+    project_analyzer.inspector.inspect = MagicMock(return_value=pd.DataFrame(columns=[
+            "filename",
+            "function_name",
+            "smell_name",
+            "line",
+            "description",
+            "additional_info",
+    ]))
+
+    # Patch DependencyGraphBuilder
+    # Note: We patch the class in the module where it is defined, because that is where it is imported from
+    with patch("components.dependency_graph_builder.DependencyGraphBuilder") as MockBuilder:
+        project_analyzer.analyze_project("dummy_project", generate_graph=True)
+        
+        # Verify it was instantiated with the correct output path
+        # project_analyzer.output_path is derived from mock_output_path
+        MockBuilder.assert_called_once_with(project_analyzer.output_path)
+        
+        # Verify build_graph was called
+        MockBuilder.return_value.build_graph.assert_called_once()
+

@@ -15,6 +15,7 @@ def test_cli_calls_project_analyzer(mock_analyzer):
         parallel=False,
         resume=False,
         multiple=False,
+        call_graph=False,
     )
 
     cli = CodeSmileCLI(args)
@@ -22,6 +23,9 @@ def test_cli_calls_project_analyzer(mock_analyzer):
     cli.execute()
 
     mock_analyzer.assert_called_once_with("/fake/output")
-    mock_instance.analyze_project.assert_called_once_with("/fake/input")
+    mock_instance.analyze_project.assert_called_once_with(
+        "/fake/input", generate_graph=False
+    )
+
 
     print("Test Passed: CLI → ProjectAnalyzer")

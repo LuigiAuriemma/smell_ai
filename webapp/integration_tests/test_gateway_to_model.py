@@ -13,7 +13,7 @@ def test_gateway_to_ai_analysis_no_smell():
     assert response.json() == {
         "code_snippet": "def my_function(): pass",
         "success": True,
-        "smells": [{"smell_name": "No Smell"}],
+        "smells": [{"smell_name": "Hyperparameter Not Explicitly Set"}],
     }
 
 

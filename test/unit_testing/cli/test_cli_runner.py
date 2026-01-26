@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, patch, ANY
 from cli.cli_runner import CodeSmileCLI
 
 
@@ -34,7 +34,7 @@ def test_execute_with_valid_arguments(mock_analyzer):
         cli.execute()
 
         # Ensure the methods were called as expected
-        mock_analyzer.analyze_project.assert_called_once_with("mock_input")
+        mock_analyzer.analyze_project.assert_called_once_with("mock_input", generate_graph=ANY)
         mock_print.assert_any_call(
             "Analysis completed. Total code smells found: 2"
         )
@@ -114,7 +114,7 @@ def test_execute_with_parallel_execution(mock_analyzer):
 
         # Ensure parallel execution method was called
         mock_analyzer.analyze_projects_parallel.assert_called_once_with(
-            "mock_input", 5
+            "mock_input", 5, generate_graph=ANY
         )
         mock_analyzer.merge_all_results.assert_called_once()
         mock_print.assert_any_call("Analysis results saved successfully.")
@@ -143,7 +143,7 @@ def test_execute_with_sequential_execution(mock_analyzer):
         cli.execute()
 
         # Ensure sequential execution method was called
-        mock_analyzer.analyze_project.assert_called_once_with("mock_input")
+        mock_analyzer.analyze_project.assert_called_once_with("mock_input", generate_graph=ANY)
         mock_print.assert_any_call(
             "Analysis completed. Total code smells found: 2"
         )
@@ -172,7 +172,7 @@ def test_execute_with_resume(mock_analyzer):
 
         # Check that clean_output_directory was not called due to resume
         mock_analyzer.clean_output_directory.assert_not_called()
-        mock_analyzer.analyze_project.assert_called_once_with("mock_input")
+        mock_analyzer.analyze_project.assert_called_once_with("mock_input", generate_graph=ANY)
         mock_print.assert_any_call(
             "Analysis completed. Total code smells found: 2"
         )
@@ -259,3 +259,28 @@ def test_execute_with_invalid_max_walkers_and_parallel(mock_analyzer):
         ValueError, match="max_walkers must be greater than 0."
     ):
         cli.execute()
+
+
+def test_execute_call_graph_flag(mock_analyzer):
+    args = MagicMock()
+    args.input = "mock_input"
+    args.output = "mock_output"
+    args.parallel = False
+    args.resume = False
+    args.multiple = False
+    args.max_walkers = 5
+    args.call_graph = True
+
+    mock_analyzer.analyze_project.return_value = 0
+    mock_analyzer.clean_output_directory = MagicMock()
+
+    cli = CodeSmileCLI(args)
+    cli.analyzer = mock_analyzer
+
+    with patch("builtins.print"):
+        cli.execute()
+
+        mock_analyzer.analyze_project.assert_called_once_with(
+            "mock_input", generate_graph=True
+        )
+

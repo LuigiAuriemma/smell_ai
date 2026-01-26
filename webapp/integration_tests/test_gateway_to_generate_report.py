@@ -43,7 +43,7 @@ def test_generate_report_valid_data():
             "all_projects_combined": [
                 {
                     "smell_name": "Unnecessary DataFrame Operation",
-                    "filename": 1,
+                    "filename": "1",
                 },
             ]
         }

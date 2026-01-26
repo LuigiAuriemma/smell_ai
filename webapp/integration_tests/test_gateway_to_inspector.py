@@ -15,6 +15,7 @@ def test_gateway_to_static_analysis_no_smell():
 
     assert response.status_code == 200
     assert response.json() == {
+        "success": True,
         "smells": 'Static analysis returned no data'
     }
 
@@ -38,6 +39,7 @@ def save_as_csv(
 
     # Mocked dataset input for testing
     expected_response = {
+        "success": True,
         "smells": [
             {
                 "function_name": "save_as_csv",
