@@ -99,6 +99,7 @@ export default function CallGraphPage() {
 
           {/* Upload Section */}
           <div 
+            data-testid="drop-zone"
             className="bg-white p-10 rounded-2xl shadow-lg border-2 border-dashed border-gray-300 hover:border-purple-500 transition-colors cursor-pointer"
             onDragOver={handleDragOver}
             onDrop={handleDrop}
@@ -111,6 +112,7 @@ export default function CallGraphPage() {
                 Upload Python File
               </label>
               <input
+                data-testid="file-input"
                 id="file-upload"
                 type="file"
                 accept=".py"
